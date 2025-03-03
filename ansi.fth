@@ -1,12 +1,3 @@
-: type ( addr c -- )
-    stdout write-file 0 <> if
-        ." ERROR" bye
-    then ;
-: emit ( n -- )
-    stdout emit-file 0 <> if
-        ." ERROR" bye
-    then ;
-: cr 10 emit ;
 : to-string ( n -- addr c )  s>d <# #s #> ;
 : ascii-esc 27 emit ;
 : esc ascii-esc s" [" type ;
@@ -21,18 +12,3 @@
 : color-reset esc s" 0m" type ;
 : cursor-on esc s" ?25l" type ;
 : cursor-off esc s" ?25h" type ;
-0 variable ch
-0 variable old-ch
-: event-loop 
-    cr
-    begin
-        clear
-        ch @ old-ch @ <> if
-            s" ch is " type 4 color-fg ch @ type-num cr color-reset
-        then
-        ch @ old-ch !
-        key ch !
-    ch @ [char] q = until
-    bye ;
-
-event-loop
