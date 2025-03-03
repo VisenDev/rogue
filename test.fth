@@ -1,8 +1,6 @@
-: array ( n "name" ) ( n -- addr )
-    create cells allot
-    does> { n addr } n addr + ." n is " n . cr ;
 
-100 array foo
-
-5 5 foo !
-5 foo @
+1 2 3 4 5 ~~
+rot ~~
+dup ~~
+0 pick ~~
+1 pick ~~
