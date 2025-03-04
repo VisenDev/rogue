@@ -4,16 +4,21 @@ include ansi.fth
     create cells allot
     does> swap cells + ;
 
-0 variable ch
-40 constant width
-40 constant height
+: let ( n "name" -- )
+    create ,
+; 
 
+40             constant width 
+20             constant height
 width height * constant cap
-0 variable map-data cap cells allot
-map-data cap cells 0 fill \ initialize map-data to 0
-20 variable player-x
-20 variable player-y
-3 variable player-len
+
+variable map-data cap cells allot
+map-data cap cells 0 fill
+
+0 let ch
+20 let player-x
+10 let player-y
+10 let player-len
 
 : edge? ( x y -- n )
     dup 0 <= 
@@ -39,13 +44,13 @@ map-data cap cells 0 fill \ initialize map-data to 0
 : record-player-tail ( -- ) 
     width 0 do
         height 0 do
-            i j map @ 0 > if
-                -1 i j map !
+            j i map @ 0 > if
+                -1 j i map +!
             then
         loop
     loop
 
-    10
+    player-len @
     player-x @
     player-y @
     map !
@@ -54,18 +59,34 @@ map-data cap cells 0 fill \ initialize map-data to 0
 : draw-arena ( -- )
     width 0 do
         height 0 do
-            i 1+ j 1+ goto
-            i j edge? if
+            j 1+ i 1+ goto
+            j i edge? if
                 s" #" type
-            then
-
-            i j map @ 0> if
-                s" @"
             else
-                s" ." type
+                j i map @ 1 >= if
+                    s" @" type
+                else
+                    s" ." type
+                then
             then
        loop
    loop ;
+
+: draw-debug ( -- )
+    0 2 height + goto
+    ." player-x " player-x ? cr
+    ." player-y " player-y ? cr
+    ." player-len " player-len ? cr
+;
+
+: record-movement ( ch -- )
+    case
+        [char] j of 1 player-y +! endof
+        [char] h of -1 player-x +! endof
+        [char] k of -1 player-y +! endof
+        [char] l of 1 player-x +! endof
+    endcase
+;
 
  
 : event-loop 
@@ -76,7 +97,9 @@ map-data cap cells 0 fill \ initialize map-data to 0
         draw-arena
         0 height 1+ goto
         s" ch is " type 4 color-fg ch @ emit color-reset
+        draw-debug
         key ch !
+        ch @ record-movement
     ch @ [char] q = until
     clear
     bye ;
