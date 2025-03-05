@@ -1,6 +1,6 @@
 \ returns the data ptr for the lastest word
 : latest-data ( -- addr ) latestxt >body ;
-: data-ptr ( "name" -- addr ) ' >body ; immediate
+\ : data-ptr ( "name" -- addr ) ' >body ; 
 
 : array ( n "name" ) ( n -- addr ) create cells allot
     does> swap cells + ;
@@ -36,17 +36,19 @@
 
 \  Testing
 5 5 array-2d _mem
-assert( 2 2 _mem @ 0 = )
-5 2 2 _mem ! 
-assert( 2 2 _mem 5 = )
-7 0 0 _mem !
-assert( 0 0 _mem 7 = )
-assert( 2 2 _mem 5 = )
-9 4 4 _mem !
-assert( 4 4 _mem 9 = )
-assert( 0 0 _mem 7 = )
-assert( 2 2 _mem 5 = )
-\ data-ptr _mem array-2d-zero
-assert( 0 4 _mem 0 = )
-assert( 0 0 _mem 0 = )
-assert( 2 2 _mem 0 = )
+: array-tests
+    assert( 2 2 _mem @ 0 = )
+    5 2 2 _mem ! 
+    assert( 2 2 _mem @ 5 = )
+    7 0 0 _mem !
+    assert( 0 0 _mem @ 7 = )
+    assert( 2 2 _mem @ 5 = )
+    9 4 4 _mem !
+    assert( 4 4 _mem @ 9 = )
+    assert( 0 0 _mem @ 7 = )
+    assert( 2 2 _mem @ 5 = )
+    ['] _mem >body array-2d-zero
+    assert( 0 4 _mem @ 0 = )
+    assert( 0 0 _mem @ 0 = )
+    assert( 2 2 _mem @ 0 = )
+; array-tests
