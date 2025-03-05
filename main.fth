@@ -6,11 +6,13 @@ include rand.fth
 
 40  constant width 
 20  constant height
+3   constant player-len-default
 
 0   let ch
 20  let player-x
 10  let player-y
-10  let player-len
+player-len-default
+    let player-len
 5   let cherry-x
 5   let cherry-y
 
@@ -26,9 +28,9 @@ width height array-2d old-map
     rand height 2 - mod 1 + cherry-y !
 ;
 
-: cherry? ( -- n )
-    player-x @ cherry-x @ = 
-    player-y @ cherry-y @ = and
+: cherry? ( x y -- n )
+    cherry-y @ = swap
+    cherry-x @ = and
 ;
 
 : reset ( -- ) 
@@ -38,9 +40,9 @@ width height array-2d old-map
             0 j i old-map !
         loop
     loop
-    10 player-x !
-    10 player-y !
-    1 player-len !
+    width 2 / player-x !
+    height 2 / player-y !
+    player-len-default player-len !
     0 ch !
     false to lost? 
 ;
@@ -68,31 +70,33 @@ width height array-2d old-map
     map !
 ;
 
-: draw-cherry ( -- )
-    cherry-x @ cherry-y @ goto
-    s" @" type
-;
-
+: tail? ( x y -- n ) map @ 1 >= ;
 : draw-map ( -- )
-    width 0 do
-        height 0 do
-            j i goto
-            j i edge? if
+    0 0 goto
+    height 0 do
+        width 0 do
+            \ j i goto
+            i j edge? if
                 s" #" type
             else
-                j i map @ 1 >= if
-                    s" c" type
+                i j cherry? if
+                    s" @" type
                 else
-                    s" ." type
+                    i j tail? if
+                        s" c" type
+                    else
+                        s" ." type
+                    then
                 then
             then
         loop
+        cr
     loop
-    0 height 1+ goto
 ;
 
 : draw-debug ( -- )
-    0 2 height + goto
+    \ 0 2 height + goto
+    cr
     ." player-x " player-x ? cr
     ." player-y " player-y ? cr
     ." player-len " player-len ? cr
@@ -110,18 +114,20 @@ width height array-2d old-map
         [char] l of 1 player-x +! endof
     endcase
 
-    player-x @ player-y @ edge? if
+    ch @ 0 <>
+    player-x @ player-y @ tail? and
+    player-x @ player-y @ edge?
+    or if
         true to lost?
     then
 
-
-    cherry? if
+    player-x @ player-y @ cherry? if
         1 player-len +!
         move-cherry
     then
 ;
 
-: record-input key? if key ch ! else ms-per-tick ms then ;
+: record-input key? if key ch ! then ;
 : quit? ch @ [char] q = ;
 
 : draw-restart-menu ( -- )
@@ -152,10 +158,10 @@ width height array-2d old-map
             update-map
 
             draw-map
-            draw-cherry
             draw-debug
         then    
 
+        ms-per-tick ms
     quit? until
     clear
     bye ;
