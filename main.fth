@@ -64,6 +64,8 @@ width height array-2d old-map
     ." player-x " player-x ? cr
     ." player-y " player-y ? cr
     ." player-len " player-len ? cr
+    ." width " width . cr
+    ." height " height . cr
 ;
 
 : record-movement ( ch -- )
