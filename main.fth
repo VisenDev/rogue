@@ -1,8 +1,5 @@
 include ansi.fth
 
-: array ( n "name" ) ( n -- addr )
-    create cells allot
-    does> swap cells + ;
 
 : let ( n "name" -- )
     create ,
