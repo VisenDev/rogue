@@ -1,5 +1,4 @@
-
-\ returns a ptr to the data pointer for the last defined word
+\ returns the data ptr for the lastest word
 : latest-data ( -- addr ) latestxt >body ;
 
 : array ( n "name" ) ( n -- addr )
@@ -12,7 +11,7 @@
 : array-2d-height ( addr - n ) 1 cells + ;
 : array-2d-items ( addr - addr ) 2 cells + ;
 : array-2d ( width height "name" -- ) ( x y -- addr)
-    create 2dup 2dup * 2 + cells allot
+    create 2dup 2dup * 3 + cells allot
         latest-data array-2d-height ! \ record height in cell 1
         latest-data array-2d-width ! \ record width in cell 0
         *

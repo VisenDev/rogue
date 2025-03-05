@@ -1,45 +1,22 @@
 include ansi.fth
+include array.fth 
 
+: let create , ;
 
-: let ( n "name" -- )
-    create ,
-; 
-
-40             constant width 
-20             constant height
-width height * constant cap
+40 constant width 
+20 constant height
+   width height *
+   constant cap
 
 0  let ch
 20 let player-x
 10 let player-y
 10 let player-len
 
-: array-2d-width ( addr - n ) @ ;
-: array-2d-height ( addr - n ) 1 cells + @ ;
-: array-2d-items ( addr - addr ) 2 cells + ;
+false value lost
 
-: array-2d ( width height -- ) ( x y -- addr)
-    create * 2 + cells allot
-    does> dup >r
-          array-2d-width * + cells r> +
-;
-
-
-variable map-data 
-    cap cells allot
-    map-data cap cells 0 fill
-
-variable old-map-data
-    cap cells allot
-    map-data cap cells 0 fill
-
-: map ( x y -- addr )
-    width * + cells map-data +
-;
-
-: old-map ( x y -- addr )
-    width * + cells map-data +
-;
+width height array-2d map
+width height array-2d old-map
 
 : edge? ( x y -- n )
     dup 0 <= 
@@ -49,16 +26,6 @@ variable old-map-data
     rot rot drop drop
 ;
 
-: print-bool ( n -- )
-    if ." true" cr else ." false" cr then ;
-
-: player? ( x y -- n)
-    player-y @ = 
-    swap player-x @ =
-    and ;
-
-
-    
 : record-player-tail ( -- ) 
     width 0 do
         height 0 do
@@ -68,7 +35,7 @@ variable old-map-data
         loop
     loop
 
-    player-len @
+    player-len @ 
     player-x @
     player-y @
     map !
@@ -108,20 +75,11 @@ variable old-map-data
     endcase
 ;
 
-: record-input ( -- )
-    key? if
-        key ch !
-    else
-        100 ms 
-    then
-;
-
-: quit? ( -- n )
-    ch @ [char] q =
-;
+: record-input key? if key ch ! else 100 ms then ;
+: quit? ch @ [char] q = ;
  
 : event-loop 
-    cr
+    clear
     begin
         record-player-tail
         draw-arena
