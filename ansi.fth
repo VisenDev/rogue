@@ -4,7 +4,7 @@
 : char-; [char] ; emit ;
 : char-H [char] H emit ;
 : type-num ( n -- ) to-string type ;
-: goto ( x y -- ) esc type-num char-; type-num char-H ;
+: goto ( x y -- ) esc 1+ type-num char-; 1+ type-num char-H ;
 : clear-from-cursor esc s" 2J" type ;
 : clear 0 0 goto clear-from-cursor ;
 : color-fg ( n -- ) esc s" 38;5;" type type-num s" m" type ;
