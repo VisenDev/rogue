@@ -12,13 +12,37 @@ include ansi.fth
 20             constant height
 width height * constant cap
 
-variable map-data cap cells allot
-map-data cap cells 0 fill
-
-0 let ch
+0  let ch
 20 let player-x
 10 let player-y
 10 let player-len
+
+: array-2d-width ( addr - n ) @ ;
+: array-2d-height ( addr - n ) 1 cells + @ ;
+: array-2d-items ( addr - addr ) 2 cells + ;
+
+: array-2d ( width height -- ) ( x y -- addr)
+    create * 2 + cells allot
+    does> dup >r
+          array-2d-width * + cells r> +
+;
+
+
+variable map-data 
+    cap cells allot
+    map-data cap cells 0 fill
+
+variable old-map-data
+    cap cells allot
+    map-data cap cells 0 fill
+
+: map ( x y -- addr )
+    width * + cells map-data +
+;
+
+: old-map ( x y -- addr )
+    width * + cells map-data +
+;
 
 : edge? ( x y -- n )
     dup 0 <= 
@@ -36,9 +60,6 @@ map-data cap cells 0 fill
     swap player-x @ =
     and ;
 
-: map ( x y -- addr )
-    height * + cells map-data +
-;
 
     
 : record-player-tail ( -- ) 
@@ -69,8 +90,10 @@ map-data cap cells 0 fill
                     s" ." type
                 then
             then
-       loop
-   loop ;
+        loop
+    loop
+    0 height 1+ goto
+;
 
 : draw-debug ( -- )
     0 2 height + goto
@@ -88,19 +111,27 @@ map-data cap cells 0 fill
     endcase
 ;
 
+: record-input ( -- )
+    key? if
+        key ch !
+    else
+        100 ms 
+    then
+;
+
+: quit? ( -- n )
+    ch @ [char] q =
+;
  
 : event-loop 
     cr
     begin
-        clear
         record-player-tail
         draw-arena
-        0 height 1+ goto
-        s" ch is " type 4 color-fg ch @ emit color-reset
         draw-debug
-        key ch !
+        record-input
         ch @ record-movement
-    ch @ [char] q = until
+    quit? until
     clear
     bye ;
 
